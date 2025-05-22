@@ -1,61 +1,75 @@
 # Hyperparameter Tuning for Early Diagnosis of Parkinson’s Disease Using Big Data
 
-This project focuses on using big data and hyperparameter tuning techniques to improve the early diagnosis of Parkinson's Disease. The analysis is performed using various datasets related to Parkinson’s Disease, processed and analyzed using Apache Spark.
+This project applies supervised machine learning to **detect Parkinson's Disease** based on vocal biomarkers. It explores how **hyperparameter tuning** improves classification performance and compares the effectiveness of different ML models using a publicly available biomedical dataset.
 
-## Introduction
+---
 
-This project aims to utilize various datasets related to Parkinson’s Disease to develop models that can aid in its early diagnosis. The project leverages the power of Apache Spark for big data processing and focuses on hyperparameter tuning to enhance model performance.
+##  Objective
 
-## Datasets
+The primary goal is to build a model that can classify whether a patient has Parkinson’s disease based on voice frequency and signal features. We apply **GridSearchCV** to identify the best hyperparameters for various models.
 
-The datasets used in this project include:
+---
 
-- Patient Status
-- Demographics
-- Family History
-- MDS-UPDRS Parts I, II, III
-- MoCA
-- STAI
-- GDS
-- QUIP
-- SCOPA-AUT
-- SFT
-- REM RBD
-- Epworth
-- HVLT
-- LNS
-- Neuro-Cranial
-- SDM
-- Benton
+##  Dataset
 
-Each dataset is stored in a CSV file and is read and processed using PySpark.
+- 📦 Source: [UCI Parkinson’s Disease Data Set](https://archive.ics.uci.edu/ml/datasets/parkinsons)
+- 195 samples (147 Parkinson's, 48 healthy)
+- 23 voice features extracted from sustained phonation recordings:
+  - MDVP: Frequency, jitter, shimmer
+  - HNR, DFA, RPDE
+- Target: `status` (1 = Parkinson's, 0 = Healthy)
 
-## Setup and Dependencies
+---
 
-To run this project, you need to have the following dependencies installed:
+## Preprocessing Steps
 
-- Python
-- PySpark
-- Jupyter Notebook
+- Checked for missing values
+- Normalized features with **StandardScaler**
+- Checked feature correlations (heatmap)
+- Separated features/labels and split into train/test
 
-### Installation
+---
 
-1. Clone this repository.
-2. Install the required Python packages.
-   ```bash
-   pip install pyspark
+## Models Evaluated
+
+| Model              | Tuning Performed         |
+|-------------------|--------------------------|
+| Logistic Regression | No (baseline)           |
+| Support Vector Machine (SVM) |  C, kernel, gamma |
+| K-Nearest Neighbors (KNN) |  n_neighbors, weights, metric |
+| Decision Tree      |  max_depth, min_samples_split |
+| Random Forest      |  n_estimators, max_depth |
+
+Used **GridSearchCV** with 5-fold cross-validation for tuning.
+
+---
+
+## Results
+
+| Model              | Accuracy | Best Parameters |
+|-------------------|----------|-----------------|
+| Logistic Regression | 88.46%  | -               |
+| SVM (RBF)           | **94.87%** | C=1000, gamma=0.001 |
+| Random Forest       | 91.02%  | n=50, max_depth=5 |
+| KNN                 | 87.17%  | k=3, metric='manhattan' |
+| Decision Tree       | 85.89%  | max_depth=5      |
+
+ **SVM** with RBF kernel and tuned hyperparameters achieved the highest accuracy and best generalization.
+
+---
 
 
-## Data Loading and Preprocessing
-The data is loaded and preprocessed using PySpark. The main steps include:
+##  Key Takeaways
 
-Reading Datasets: Each dataset is read from a CSV file and registered as a temporary table in Spark.
-Filtering and Cleaning: Unwanted columns are dropped, and specific filtering criteria are applied.
-Imputation: Missing values are imputed using linear interpolation.
+- Hyperparameter tuning significantly boosts performance, especially for SVM and Random Forest.
+- Simple classifiers like KNN and Logistic Regression work reasonably well but plateau early.
+- The dataset is slightly imbalanced but tuning improves sensitivity to the minority class (healthy patients).
 
-## Hyperparameter Tuning
-Hyperparameter tuning is performed to optimize the model parameters for better performance. The process involves:
+---
 
-Defining the parameter grid.
-Using cross-validation to evaluate different parameter combinations.
-Selecting the best model based on performance metrics.
+## Tools & Libraries
+
+- Python (NumPy, Pandas, Scikit-learn)
+- Matplotlib, Seaborn for plots
+- GridSearchCV for model optimization
+
